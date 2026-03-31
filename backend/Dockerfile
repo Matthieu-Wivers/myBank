@@ -4,13 +4,28 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     libpq-dev \
-    libicu-dev \
-    libzip-dev \
-    && docker-php-ext-install pdo_pgsql intl zip opcache \
-    && a2enmod rewrite headers \
+    && docker-php-ext-install pdo pdo_pgsql \
+    && a2enmod rewrite \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-COPY docker/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
+
+COPY . .
+
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-progress \
+    --prefer-dist \
+    --no-scripts
+
+RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
+    && sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf \
+    && chown -R www-data:www-data /var/www/html
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]

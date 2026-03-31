@@ -5,3 +5,5 @@ backend/.env.dev
 
 # Frontend
 frontend/.env
+
+README_context.md

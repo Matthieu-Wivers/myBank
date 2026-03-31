@@ -3,3 +3,5 @@
 var/cache
 var/log
 vendor
+.env
+.env.local
