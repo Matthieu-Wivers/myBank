@@ -1,0 +1,5 @@
+.git
+.gitignore
+var/cache
+var/log
+vendor
